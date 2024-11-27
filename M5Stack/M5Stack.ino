@@ -690,7 +690,7 @@ class CmdCallbacks : public BLECharacteristicCallbacks {
     // SET_PULL   0x04
     // SET_EVENT  0x05
 
-    std::string value = pCharacteristic->getValue();
+    String value = pCharacteristic->getValue();
     log_i("CMD len:%d\n", value.length());
     log_i("%s\n", value.c_str());
     const char *cmd_str = value.c_str();
@@ -987,15 +987,12 @@ void setup_pins() {
 void setup_BLE() {
   // Create MAC address base fixed ID
   uint8_t mac0[6] = { 0 };
-#if !defined(ARDUINO_WIO_TERMINAL)
-  esp_efuse_mac_get_default(mac0);
-#else
   // Create random mac address for avoid conflict ID.
   randomSeed(analogRead(A0));
   for (int i = 0; i < sizeof(mac0); i++) {
     mac0[i] = random(256);
   }
-#endif
+
   String ID;
   for (int i = 0; i < 6; i++) {
     char ID_char = (((mac0[i] - 0x61) & 0b0011110) >> 1) + 0x61;
