@@ -32,6 +32,8 @@ pin_mode_t pin_mode[17] = { PIN_ANALOG_INPUT };
 #include <M5Dial.h>
 #include <M5StackUpdater.h>
 
+#include "esp_mac.h"
+
 //// Global variables for M5Stack.
 // Board name
 m5::board_t myBoard = m5gfx::board_unknown;
@@ -900,6 +902,7 @@ void setup_BLE() {
   // Create MAC address base fixed ID
   uint8_t mac0[6] = { 0 };
   // Create random mac address for avoid conflict ID.
+  esp_efuse_mac_get_default(mac0);
   randomSeed(analogRead(analogRead(pin[0])));
   for (int i = 0; i < sizeof(mac0); i++) {
     mac0[i] = random(256);
