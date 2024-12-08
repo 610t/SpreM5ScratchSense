@@ -612,6 +612,18 @@ class CmdCallbacks : public BLECharacteristicCallbacks {
       M5.Power.setLed(constrain(data_val, 0, 255));
     }
 
+    // LED output to Spresense
+    static int led = (int)data_val;
+    if (strcmp(label, "led0") == 0) {
+      Serial2.printf("LED0:%d\n", led);
+    } else if (strcmp(label, "led1") == 0) {
+      Serial2.printf("LED1:%d\n", led);
+    } else if (strcmp(label, "led2") == 0) {
+      Serial2.printf("LED2:%d\n", led);
+    } else if (strcmp(label, "led3") == 0) {
+      Serial2.printf("LED3:%d\n", led);
+    }
+
     // Set variables for drawing object.
     set_variables(label_str, data_val, data_str);
 
@@ -1004,6 +1016,7 @@ void setup_BLE() {
 
 void setup() {
   Serial.begin(115200);
+  Serial2.begin(115200);
 
   setup_M5Stack();
   screen_w = M5.Lcd.width();
