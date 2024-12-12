@@ -1198,4 +1198,33 @@ void loop() {
       old_label_time = label_time;
     }
   }
+
+  //// Get data from Spresense via Serial2.
+  int av = Serial2.available();
+
+  // When serial2 data is available...
+  if (av > 0) {
+    char buf[1024] = { 0 };
+
+    Serial2.readBytes(buf, av);
+    memset((char *)(action), 0, 20);  // clear action buffer
+    action[19] = DATA_TEXT;           // Data send as text.
+    // action[19] = DATA_NUMBER;           // Data send as number.
+
+    // Label 'GPS'
+    action[0] = 'G';
+    action[1] = 'P';
+    action[2] = 'S';
+    action[3] = 0;
+
+    // The data buffer can handle 18 - 8 characters.
+    for (int i = 0; i < av && i + 8 < 19; i++) {
+      action[i + 8] = buf[i];
+    }
+
+    // Send data to Scratch with label 'GPS'.
+    pCharacteristic[4]->setValue(action, 20);
+    pCharacteristic[4]->notify();
+    Serial2.printf("\r\nData(%d):%s\n", av, buf);
+  }
 };
