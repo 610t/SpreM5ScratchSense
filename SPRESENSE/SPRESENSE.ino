@@ -1,7 +1,7 @@
 #include <GNSS.h>
 
 #define STRING_BUFFER_SIZE 128
-#define RESTART_CYCLE (60 * 5)
+#define RESTART_CYCLE (60 * 5)  // Every 5min
 static SpGnss Gnss;
 
 void setup() {
@@ -10,15 +10,13 @@ void setup() {
   Serial.begin(115200);
   Serial2.begin(115200);  // Connect to M5Stack via Serial2.
 
-  ledOn(PIN_LED0);  // Turn on LED0 :Setup start.
+  ledOn(PIN_LED0);  // Turn on LED0 to indicate initialize
 
   Gnss.setDebugMode(PrintInfo);  // Set Debug mode to Info
 
-  result = Gnss.begin();
-
-  if (result != 0) {
+  if (Gnss.begin() != 0) {
     Serial.println("Gnss begin error!!");
-    ledOff(PIN_LED2);
+    ledOn(PIN_LED1);
     exit(0);
   }
 
@@ -28,16 +26,16 @@ void setup() {
   Gnss.select(QZ_L1CA);
 
   // Start positioning
-  result = Gnss.start(COLD_START);
-  if (result != 0) {
+  if (Gnss.start(COLD_START) != 0) {
     Serial.println("Gnss start error!!");
-    ledOff(PIN_LED3);
+    ledOn(PIN_LED2);
     exit(0);
   }
 
   ledOff(PIN_LED0);  /// Turn off LED0 :Setup done.
 }
 
+// Print received data Serial for debug and Serial2 for M5Stack
 static void print_with_debug(char *strbuf) {
   Serial.print(strbuf);
   Serial2.print(strbuf);
@@ -46,22 +44,33 @@ static void print_with_debug(char *strbuf) {
 static void print_pos(SpNavData *pNavData) {
   char StringBuffer[STRING_BUFFER_SIZE];
 
-  // print date & time via Serial2
+  // print date & time
   snprintf(StringBuffer, STRING_BUFFER_SIZE, "Date:%04d/%02d/%02d\n", pNavData->time.year, pNavData->time.month, pNavData->time.day);
   print_with_debug(StringBuffer);
 
-  snprintf(StringBuffer, STRING_BUFFER_SIZE, "Time:%02d:%02d:%02d.%06ld\n", pNavData->time.hour, pNavData->time.minute, pNavData->time.sec, pNavData->time.usec);
+  snprintf(StringBuffer, STRING_BUFFER_SIZE, "Time:%02d%02d%02d.%02d\n", pNavData->time.hour, pNavData->time.minute, pNavData->time.sec, int(pNavData->time.usec / 10000));
   print_with_debug(StringBuffer);
 
   // print satellites count
   snprintf(StringBuffer, STRING_BUFFER_SIZE, "numSat:%2d\n", pNavData->numSatellites);
   print_with_debug(StringBuffer);
 
+  snprintf(StringBuffer, STRING_BUFFER_SIZE, "numSatCalc:%2d\n", pNavData->numSatellitesCalcPos);
+  print_with_debug(StringBuffer);
+
+  // HDOP
+  snprintf(StringBuffer, STRING_BUFFER_SIZE, "HDOP:%.1f\n", pNavData->hdop);
+  print_with_debug(StringBuffer);
+
+  // altitude
+  snprintf(StringBuffer, STRING_BUFFER_SIZE, "alt:%.1f\n", pNavData->altitude);
+  print_with_debug(StringBuffer);
+
   // print position data
   if (pNavData->posFixMode == FixInvalid) {
-    Serial.printf("Fix:No-Fix\n");
+    print_with_debug("Fix:No-Fix\n");
   } else {
-    Serial.printf("Fix:Fix\n");
+    print_with_debug("Fix:Fix\n");
   }
   if (pNavData->posDataExist == 0) {
     Serial.print("Post:No Position\n");
