@@ -4,6 +4,8 @@
 #define RESTART_CYCLE (60 * 5)  // Every 5min
 static SpGnss Gnss;
 
+int led_pins[] = { PIN_LED0, PIN_LED1, PIN_LED2, PIN_LED3 };
+
 void setup() {
   int result;
 
@@ -130,32 +132,14 @@ void loop() {
     av = Serial2.available();
 
     if (line.startsWith("LED")) {
-      Serial.printf("** %s\n", line.c_str());
-    }
+      line.replace("LED", "");
+      int led_num = (int)line.charAt(0) - 48; // 48 means ascii code of '0'
+      line.replace(String(led_num) + ":", "");
 
-    if (line.startsWith("LED0:")) {
-      if (strcmp(getStrValue(line, "LED0:").c_str(), "on") == 0) {
-        ledOn(PIN_LED0);
+      if (strcmp(line.c_str(), "on") == 0) {
+        ledOn(led_pins[led_num]);
       } else {
-        ledOff(PIN_LED0);
-      }
-    } else if (line.startsWith("LED1:")) {
-      if (strcmp(getStrValue(line, "LED1:").c_str(), "on") == 0) {
-        ledOn(PIN_LED1);
-      } else {
-        ledOff(PIN_LED1);
-      }
-    } else if (line.startsWith("LED2:")) {
-      if (strcmp(getStrValue(line, "LED2:").c_str(), "on") == 0) {
-        ledOn(PIN_LED2);
-      } else {
-        ledOff(PIN_LED2);
-      }
-    } else if (line.startsWith("LED3:")) {
-      if (strcmp(getStrValue(line, "LED3:").c_str(), "on") == 0) {
-        ledOn(PIN_LED3);
-      } else {
-        ledOff(PIN_LED3);
+        ledOff(led_pins[led_num]);
       }
     }
   }
