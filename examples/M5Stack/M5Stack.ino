@@ -613,15 +613,15 @@ class CmdCallbacks : public BLECharacteristicCallbacks {
     }
 
     // LED output to Spresense
-    static int led = (int)data_val;
+    const char *led = data_str.c_str();
     if (strcmp(label, "led0") == 0) {
-      Serial2.printf("LED0:%d\n", led);
+      Serial2.printf("LED0:%s\n", led);
     } else if (strcmp(label, "led1") == 0) {
-      Serial2.printf("LED1:%d\n", led);
+      Serial2.printf("LED1:%s\n", led);
     } else if (strcmp(label, "led2") == 0) {
-      Serial2.printf("LED2:%d\n", led);
+      Serial2.printf("LED2:%s\n", led);
     } else if (strcmp(label, "led3") == 0) {
-      Serial2.printf("LED3:%d\n", led);
+      Serial2.printf("LED3:%s\n", led);
     }
 
     // Set variables for drawing object.

@@ -105,9 +105,60 @@ static void print_condition(SpNavData *pNavData) {
   }
 }
 
+String getStrValue(String data, String pattern) {
+  data.replace(pattern.c_str(), "");
+  return (data);
+}
+
+float getFloatValue(String data, String pattern) {
+  data.replace(pattern.c_str(), "");
+  return (data.toFloat());
+}
+
+int getIntValue(String data, String pattern) {
+  data.replace(pattern.c_str(), "");
+  return (data.toInt());
+}
+
 void loop() {
   static int LoopCount = 0;
   static int LastPrintMin = 0;
+
+  int av = Serial2.available();
+  while (av > 0) {
+    String line = Serial2.readStringUntil('\n');
+    av = Serial2.available();
+
+    if (line.startsWith("LED")) {
+      Serial.printf("** %s\n", line.c_str());
+    }
+
+    if (line.startsWith("LED0:")) {
+      if (strcmp(getStrValue(line, "LED0:").c_str(), "on") == 0) {
+        ledOn(PIN_LED0);
+      } else {
+        ledOff(PIN_LED0);
+      }
+    } else if (line.startsWith("LED1:")) {
+      if (strcmp(getStrValue(line, "LED1:").c_str(), "on") == 0) {
+        ledOn(PIN_LED1);
+      } else {
+        ledOff(PIN_LED1);
+      }
+    } else if (line.startsWith("LED2:")) {
+      if (strcmp(getStrValue(line, "LED2:").c_str(), "on") == 0) {
+        ledOn(PIN_LED2);
+      } else {
+        ledOff(PIN_LED2);
+      }
+    } else if (line.startsWith("LED3:")) {
+      if (strcmp(getStrValue(line, "LED3:").c_str(), "on") == 0) {
+        ledOn(PIN_LED3);
+      } else {
+        ledOff(PIN_LED3);
+      }
+    }
+  }
 
   // Check update.
   if (Gnss.waitUpdate(-1)) {
