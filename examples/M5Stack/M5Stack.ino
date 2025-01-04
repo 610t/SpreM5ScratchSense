@@ -1209,22 +1209,32 @@ void loop() {
     av = Serial2.available();
 
     memset((char *)(action), 0, 20);  // clear action buffer
-    action[19] = DATA_TEXT;           // Data send as text.
-    // action[19] = DATA_NUMBER;           // Data send as number.
 
-    // Label 'GPS'
     const char *label_str = label.c_str();
     strncpy((char *)action, label_str, 7);
 
-    // The data buffer can handle 18 - 8 characters.
-    const char *buf = value.c_str();
-    for (int i = 0; i < av && i + 8 < 19; i++) {
-      action[i + 8] = buf[i];
+    // These data is passed as String(TEXT).
+    if (label.startsWith("Date") || label.startsWith("Fix")) {
+      action[19] = DATA_TEXT;  // Data send as text.
+
+      // The data buffer can handle 18 - 8 characters.
+      const char *buf = value.c_str();
+      for (int i = 0; i < av && i + 8 < 19; i++) {
+        action[i + 8] = buf[i];
+      }
+    } else {
+      // Other data is passed as float.
+      action[19] = DATA_NUMBER;  // Data send as number.
+
+      cd.f = value.toFloat();
+      action[8] = cd.b[0];
+      action[9] = cd.b[1];
+      action[10] = cd.b[2];
+      action[11] = cd.b[3];
     }
 
     // Send data to Scratch with label 'GPS'.
     pCharacteristic[4]->setValue(action, 20);
     pCharacteristic[4]->notify();
-    Serial2.printf("\r\nData(%d):%s\n", av, buf);
   }
 };
