@@ -1203,21 +1203,21 @@ void loop() {
   int av = Serial2.available();
 
   // When serial2 data is available...
-  if (av > 0) {
-    char buf[1024] = { 0 };
+  while (av > 0) {
+    String label = Serial2.readStringUntil(':');
+    String value = Serial2.readStringUntil('\n');
+    av = Serial2.available();
 
-    Serial2.readBytes(buf, av);
     memset((char *)(action), 0, 20);  // clear action buffer
     action[19] = DATA_TEXT;           // Data send as text.
     // action[19] = DATA_NUMBER;           // Data send as number.
 
     // Label 'GPS'
-    action[0] = 'G';
-    action[1] = 'P';
-    action[2] = 'S';
-    action[3] = 0;
+    const char *label_str = label.c_str();
+    strncpy((char *)action, label_str, 7);
 
     // The data buffer can handle 18 - 8 characters.
+    const char *buf = value.c_str();
     for (int i = 0; i < av && i + 8 < 19; i++) {
       action[i + 8] = buf[i];
     }
