@@ -1,6 +1,8 @@
 # SpreM5ScratchSense
 SpreM5ScratchSense: Realize [SPRESENSE](https://developer.sony.com/ja/spresense) and [Scratch](https://scratch.mit.edu/)([Stretch3](https://stretch3.github.io/)) interaction via [M5Stack](https://m5stack.com/).
 
+![System image](image/System.svg)
+
 From Scratch to SPRESENSE, control LED blinking using label `led0`-`led3` with data `on` or `off`.
 
 From SPRESENSE to Scratch, send these GPS related data.
